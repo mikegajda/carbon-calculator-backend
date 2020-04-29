@@ -126,7 +126,7 @@ class AWSV4AuthHelperTest {
         headers.put("content-encoding", "amz-1.0");
 
         // Put your Access Key in place of <ACCESS_KEY> and Secret Key in place of <SECRET_KEY> in double quotes
-        AWSV4Auth awsv4Auth = new AWSV4Auth.Builder("AKIAIB2PL2M2BSV65D2A", "1WS2QWRo16PQaFURqnGjINsrGFXKSqgMnc+UYgwj")
+        AWSV4Auth awsv4Auth = new AWSV4Auth.Builder(amazonConfig.amazonAccessKey, amazonConfig.amazonSecretKey)
                 .path(path)
                 .region(region)
                 .service("ProductAdvertisingAPI")

@@ -22,7 +22,7 @@ public class AWSV4AuthHelper {
         headers.put("x-amz-target", target);
         headers.put("content-encoding", "amz-1.0");
 
-        AWSV4Auth awsv4Auth = new AWSV4Auth.Builder("AKIAIB2PL2M2BSV65D2A", "1WS2QWRo16PQaFURqnGjINsrGFXKSqgMnc+UYgwj")
+        AWSV4Auth awsv4Auth = new AWSV4Auth.Builder(amazonConfig.amazonAccessKey, amazonConfig.amazonSecretKey)
                 .path(amazonConfig.amazonPAAPI5Path)
                 .region(amazonConfig.amazonRegion)
                 .service("ProductAdvertisingAPI")
