@@ -8,11 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.TreeMap;
+import org.springframework.http.HttpHeaders;
 
 @Slf4j
 public class AWSV4AuthHelper {
     private static ObjectMapper mapper = new ObjectMapper();
-    public static Map<String, String> generateHeaders(AmazonConfig amazonConfig, Object searchRequest, String target) throws JsonProcessingException {
+    public static HttpHeaders generateHeaders(AmazonConfig amazonConfig, Object searchRequest, String target) throws JsonProcessingException {
         String searchRequestBody = mapper.writeValueAsString(searchRequest);
         log.info("searchRequestBody={}", searchRequestBody);
         TreeMap<String, String> headers = new TreeMap<>();
@@ -31,6 +32,12 @@ public class AWSV4AuthHelper {
                 .payload(searchRequestBody)
                 .build();
 
-        return awsv4Auth.getHeaders();
+        Map<String, String> allHeaders = awsv4Auth.getHeaders();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        for (Map.Entry<String, String> entrySet : allHeaders.entrySet()) {
+            httpHeaders.add(entrySet.getKey(), entrySet.getValue());
+        }
+
+        return httpHeaders;
     }
 }

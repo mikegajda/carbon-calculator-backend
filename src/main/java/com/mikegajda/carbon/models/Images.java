@@ -14,29 +14,29 @@ import java.util.Map;
 @ToString
 public class Images {
 
-    @JsonProperty("Primary")
-    private Primary primary;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  @JsonProperty("Primary")
+  private Primary primary;
+  @JsonIgnore
+  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("Primary")
-    public Primary getPrimary() {
-        return primary;
-    }
+  @JsonProperty("Primary")
+  public Primary getPrimary() {
+    return primary;
+  }
 
-    @JsonProperty("Primary")
-    public void setPrimary(Primary primary) {
-        this.primary = primary;
-    }
+  @JsonProperty("Primary")
+  public void setPrimary(Primary primary) {
+    this.primary = primary;
+  }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
+  @JsonAnyGetter
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+    this.additionalProperties.put(name, value);
+  }
 
 }
