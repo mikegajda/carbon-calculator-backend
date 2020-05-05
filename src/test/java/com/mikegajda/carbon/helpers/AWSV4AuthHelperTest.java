@@ -5,15 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mikegajda.carbon.components.AWSV4Auth;
 import com.mikegajda.carbon.components.AmazonConfig;
-import com.mikegajda.carbon.models.BrowseNode;
 import com.mikegajda.carbon.models.Item;
 import com.mikegajda.carbon.models.PAAPISearchRequest;
 import com.mikegajda.carbon.models.PAAPISearchResponse;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,8 +37,19 @@ class AWSV4AuthHelperTest {
 
   private RestTemplate restTemplate = new RestTemplate();
 
+
+  @Before
+  public void before() throws Exception {
+
+  }
+
   @Test
   public void testGenerateHeaders() throws Exception {
+    // create a writer
+    Writer writer = Files.newBufferedWriter(Paths.get("output.csv"));
+
+    // write CSV file
+    CSVPrinter printer = CSVFormat.DEFAULT.print(writer);
     List<String> resources = new ArrayList<>();
     resources.add("ItemInfo.Title");
     resources.add("ItemInfo.ContentInfo");
@@ -54,21 +70,37 @@ class AWSV4AuthHelperTest {
     org.springframework.http.HttpEntity<String> request = new org.springframework.http.HttpEntity<String>(
         requestBody, httpHeaders);
 
+//    log.info("string verison={}", restTemplate
+//        .postForEntity("https://" + amazonConfig.amazonHost + amazonConfig.amazonPAAPI5Path,
+//            request, String.class).getBody().toString());
     ResponseEntity<PAAPISearchResponse> responseEntity = restTemplate
         .postForEntity("https://" + amazonConfig.amazonHost + amazonConfig.amazonPAAPI5Path,
             request, PAAPISearchResponse.class);
-    log.info("repsonseBody={}", responseEntity.getBody().toString());
-    log.info("path={}",
-        responseEntity.getBody().getSearchResult().getItems().get(0).getBrowseNodeInfo()
-            .getBrowseNodes().get(0).getPath());
+//    log.info("repsonseBody={}", responseEntity.getBody().toString());
+
     List<Item> items = responseEntity.getBody().getSearchResult().getItems();
-    for(Item item: items){
-      log.info("item name={}", item.getItemInfo().getTitle().getDisplayValue());
-      List<BrowseNode> browseNodes = item.getBrowseNodeInfo().getBrowseNodes();
-      for (BrowseNode browseNode: browseNodes){
-        log.info("item name={}, path={}", item.getItemInfo().getTitle().getDisplayValue(), browseNode.getPath());
-      }
+    for (Item item: items){
+      log.info("item={}, path={}", item.getItemInfo().getTitle().getDisplayValue(),
+          item.getBrowseNodeInfo().getBrowseNodes().get(0).getPath());
+      String title = item.getItemInfo().getTitle().getDisplayValue();
+      String path = item.getBrowseNodeInfo().getBrowseNodes().get(0).getPath();
+      String asin = item.getASIN();
+      String browseNodeId = item.getBrowseNodeInfo().getBrowseNodes().get(0).getId();
+
+      printer.printRecord(asin, title, path, browseNodeId);
+      printer.flush();
     }
+
+
+//    for (Item item : items) {
+//      log.info("item name={}", item.getItemInfo().getTitle().getDisplayValue());
+//      List<BrowseNode> browseNodes = item.getBrowseNodeInfo().getBrowseNodes();
+//      for (BrowseNode browseNode : browseNodes) {
+////        log.info("item name={}, path={}", item.getItemInfo().getTitle().getDisplayValue(), browseNode.getPath());
+//        log.info("item name={}, rootPath={}", item.getItemInfo().getTitle().getDisplayValue(),
+//            browseNode.getRootNode());
+//      }
+//    }
     assertEquals(200, responseEntity.getStatusCode().value());
   }
 
@@ -146,5 +178,30 @@ class AWSV4AuthHelperTest {
 
     return awsv4Auth.getHeaders();
   }
+//
+//  @Test
+//  public void csvWriterTest() {
+//    try {
+//
+//      // create a list
+//      List<Object[]> data = new ArrayList<>();
+//      data.add(new Object[]{1, "John Mike", "Engineering", "MIT"});
+//      data.add(new Object[]{2, "Jovan Krovoski", "Medical", "Harvard"});
+//      data.add(new Object[]{3, "Lando Mata", "Computer Science", "TU Berlin"});
+//      data.add(new Object[]{4, "Emma Ali", "Mathematics", "Oxford"});
+//
+//      // write list to file
+//      printer.printRecords(data);
+//
+//      // flush the stream
+//      printer.flush();
+//
+//      // close the writer
+//      writer.close();
+//
+//    } catch (IOException ex) {
+//      ex.printStackTrace();
+//    }
+//  }
 
 }
